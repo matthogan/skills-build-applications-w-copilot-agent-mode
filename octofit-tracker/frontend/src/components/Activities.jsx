@@ -1,5 +1,10 @@
 import { useEffect, useState } from 'react'
 
+const codespaceName = import.meta.env.VITE_CODESPACE_NAME
+const fallbackEndpoint = codespaceName
+  ? `https://${codespaceName}-8000.app.github.dev/api/activities/`
+  : 'http://localhost:8000/api/activities/'
+
 function normalizeItems(payload) {
   if (Array.isArray(payload)) return payload
   if (Array.isArray(payload?.items)) return payload.items
@@ -15,12 +20,13 @@ function Activities({ apiBaseUrl }) {
 
   useEffect(() => {
     let ignore = false
+    const endpoint = apiBaseUrl ? `${apiBaseUrl}/activities/` : fallbackEndpoint
 
     async function fetchActivities() {
       try {
         setLoading(true)
         setError('')
-        const response = await fetch(`${apiBaseUrl}/activities/`)
+        const response = await fetch(endpoint)
         if (!response.ok) {
           throw new Error(`Request failed with status ${response.status}`)
         }
